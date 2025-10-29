@@ -4,12 +4,12 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Custom styled components for Barbie theme
+
 const BarbiePaper = styled(Paper)(({ theme }) => ({
-  background: 'linear-gradient(135deg, #FFC0CB, #FF69B4)', // Pink gradient
+  background: 'linear-gradient(135deg, #FFC0CB, #FF69B4)', 
   padding: '40px',
   borderRadius: '20px',
-  boxShadow: '0px 10px 30px rgba(255, 105, 180, 0.4)', // Pink shadow
+  boxShadow: '0px 10px 30px rgba(255, 105, 180, 0.4)', 
   textAlign: 'center',
   maxWidth: '450px',
   width: '90%',
@@ -20,7 +20,7 @@ const BarbiePaper = styled(Paper)(({ theme }) => ({
   alignItems: 'center',
   position: 'relative',
   overflow: 'hidden',
-  '&::before': { // Subtle glitter effect
+  '&::before': { 
     content: '""',
     position: 'absolute',
     top: 0,
@@ -34,7 +34,7 @@ const BarbiePaper = styled(Paper)(({ theme }) => ({
 }));
 
 const BarbieHeading = styled(Typography)(({ theme }) => ({
-  fontFamily: "'Lobster', cursive", // A playful, script-like font
+  fontFamily: "'Lobster', cursive", 
   fontSize: '3.5rem',
   color: '#FFFFFF',
   textShadow: '3px 3px 6px rgba(0,0,0,0.3)',
@@ -43,7 +43,7 @@ const BarbieHeading = styled(Typography)(({ theme }) => ({
 }));
 
 const BarbieSubheading = styled(Typography)(({ theme }) => ({
-  fontFamily: "'Comic Sans MS', cursive", // Another playful option or 'Arial', sans-serif
+  fontFamily: "'Comic Sans MS', cursive", 
   fontSize: '1.2rem',
   color: '#FFFFFF',
   marginBottom: '30px',
@@ -55,13 +55,13 @@ const BarbieTextField = styled(TextField)(({ theme }) => ({
     borderRadius: '10px',
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     '& fieldset': {
-      borderColor: '#FF69B4', // Pink border
+      borderColor: '#FF69B4', 
     },
     '&:hover fieldset': {
-      borderColor: '#FF1493', // Darker pink on hover
+      borderColor: '#FF1493', 
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#FF1493', // Darker pink on focus
+      borderColor: '#FF1493', 
       borderWidth: '2px',
     },
   },
@@ -70,16 +70,16 @@ const BarbieTextField = styled(TextField)(({ theme }) => ({
     padding: '12px 15px',
   },
   '& .MuiInputLabel-root': {
-    color: '#FF69B4', // Pink label
+    color: '#FF69B4',
     '&.Mui-focused': {
-      color: '#FF1493', // Darker pink label on focus
+      color: '#FF1493', 
     },
   },
   marginBottom: '20px',
 }));
 
 const BarbieButton = styled(Button)(({ theme }) => ({
-  background: 'linear-gradient(45deg, #FF1493 30%, #FF69B4 90%)', // Darker pink button gradient
+  background: 'linear-gradient(45deg, #FF1493 30%, #FF69B4 90%)', 
   color: 'white',
   fontWeight: 'bold',
   padding: '12px 30px',
@@ -90,7 +90,7 @@ const BarbieButton = styled(Button)(({ theme }) => ({
   '&:hover': {
     transform: 'scale(1.03)',
     boxShadow: '0 8px 20px rgba(255, 20, 147, 0.6)',
-    background: 'linear-gradient(45deg, #FF69B4 30%, #FF1493 90%)', // Reverse gradient on hover
+    background: 'linear-gradient(45deg, #FF69B4 30%, #FF1493 90%)', 
   },
   fontSize: '1.2rem',
   letterSpacing: '1px',
@@ -119,13 +119,13 @@ const Signup = () => {
       .then((result) => {
         console.log("Response from server:", result);
         if (result.status === 200 || result.status === 201) {
-          window.alert("Signup successful! Welcome to the Dream World!");
+          window.alert("Signup successful! Welcome to the barbie World!");
           navigate("/login");
         }
       })
       .catch((err) => {
         if (err.response && err.response.status === 400 && err.response.data.message === "Email already exists") {
-          // Assuming your server sends a specific message for existing email
+         
           window.alert("Email already exists. Please try logging in or use a different email.");
         } else {
           console.error("Signup error:", err);
@@ -136,9 +136,9 @@ const Signup = () => {
 
   return (
     <BackgroundGrid container>
-      <BarbiePaper elevation={10}> {/* Increased elevation for more pop */}
+      <BarbiePaper elevation={10}> {}
         <BarbieHeading>SIGN UP!</BarbieHeading>
-        <BarbieSubheading>Welcome to the Dream World!</BarbieSubheading>
+        <BarbieSubheading>Welcome to the barbie World!</BarbieSubheading>
 
         <form onSubmit={handleSignup} style={{ width: '100%' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -147,7 +147,7 @@ const Signup = () => {
               name="name"
               required
               fullWidth
-              label="Dreamer Name"
+              label="Name"
               variant="outlined"
             />
             <BarbieTextField
@@ -156,7 +156,7 @@ const Signup = () => {
               type="email"
               required
               fullWidth
-              label="Dream Email"
+              label=" Email"
               variant="outlined"
             />
             <BarbieTextField
