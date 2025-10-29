@@ -1,17 +1,55 @@
-import {Link} from "react-router-dom";
-import {AppBar ,Typography, Toolbar,Button} from "@mui/material";
-const Navbar = () => {
-  const button={marginRight:"20px",fontSize:"1.1rem",fontWeight:"400",padding:"0.3rem"};
-  return (
-    <AppBar sx={{bgcolor:'#cba181'}}>
-      <Toolbar>
-        <Typography variant="h4" sx={{flexGrow: 1}}>Barbie</Typography>
-        <Button  style={button} color="success" variant="contained" to="/login"component={Link}>Login</Button>
-        <Button  style={button} color="warning" variant="contained" to="/signup"component={Link}>Signup</Button>
-        <Button  style={button} color="error"variant="contained" to="/Logout"component={Link}>Logout</Button>
-      </Toolbar>
-    </AppBar>
-  )
-}
+import { Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-export default Navbar;
+const Header = () => {
+  const navigate = useNavigate();
+
+  const headerStyle = {
+    background: "linear-gradient(90deg, #f2c7b3, #f7a8b8)",
+    color: "#3d2b2b",
+    padding: "25px 50px",
+    width:1300,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    fontWeight: "bold",
+    fontSize: "1.6rem",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+     position:"static"
+  };
+
+  const buttonStyle = {
+    borderRadius: "20px",
+    marginLeft: "10px",
+    fontWeight: "600",
+    padding: "6px 18px",
+    
+  };  
+  
+
+  return (
+    <div style={headerStyle}>
+      <div>Barbie</div>
+      <div>
+        <Button
+          variant="contained"
+          color="success"
+          style={buttonStyle}
+          onClick={() => navigate("/login")}
+        >
+          LOGIN
+        </Button>
+        <Button
+          variant="contained"
+          color="warning"
+          style={buttonStyle}
+          onClick={() => navigate("/signup")}
+        >
+          SIGNUP
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default Header;
