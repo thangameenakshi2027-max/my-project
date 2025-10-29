@@ -1,115 +1,127 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const dotenv = require("dotenv");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const UserModel = require("./model/User");
-const express = require("express");
-const cors = require("cors");
-const app =express();
+import express from "express";
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import cors from "cors";
+import dotenv from "dotenv";
+import User from "./model/User.js";
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3001;
 
 
+app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173",  
+  origin: ["http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
-dotenv.config();
 
-app.use(express.json());
-app.use(cors({
-    origin: 'http://localhost:3001', 
-    credentials: true
-}));
-
-
-mongoose.connect(process.env.MONGO_URI) 
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('Failed to connect to MongoDB', err));
+mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/mern_dashboard", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("✅ MongoDB Connected"))
+.catch(err => console.error("❌ MongoDB connection error:", err));
 
 
 app.use(session({
-    secret: "mongodb+srv://meena:meenaa@cluster0.zqsphnk.mongodb.net/crud",
-    resave: false,
-    saveUninitialized: true,
-    store: MongoStore.create({
-        mongoUrl: "mongodb+srv://meena:meenaa@cluster0.zqsphnk.mongodb.net/crud"
-    }),
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } 
+  secret: process.env.SESSION_SECRET || "supersecretkey",
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/mern_dashboard"
+  }),
+  cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-const PORT=3001;
-app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT}`);
+app.get("/api/users", async (req, res) => {
+  const users = await User.find(); 
+  res.json(users);
 });
+app.delete("/api/users/:id", async (req, res) => {
+  try {
+    const { id } = req.params; 
+    
+   
+    const deletedUser = await User.findByIdAndDelete(id); 
 
-app.post("/api/auth/login", (req, res) => {
-  res.send({ message: "Login successful" });
-});
-
-
-
-app.post("/signup", async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-        const existingUser = await UserModel.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ error: "Email already exists" });
-        }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new UserModel({ name, email, password: hashedPassword });
-        const savedUser = await newUser.save();
-        res.status(201).json(savedUser);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    res.json({ message: "User deleted successfully" });
+
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ message: "Server error while deleting user" });
+  }
 });
 
+app.post("/api/users", async (req, res) => {
+  const { name, email, password } = req.body;
+  const existing = await User.findOne({ email }); 
+  if (existing) return res.status(400).json({ message: "Email exists" });
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = new User({ name, email, password: hashedPassword }); 
+  await newUser.save();
+  res.status(201).json(newUser);
+});
 
 
 app.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await UserModel.findOne({ email });
-        if (user) {
-            const passwordMatch = await bcrypt.compare(password, user.password);
-            if (passwordMatch) {
-                res.json("Success");
-                req.session.user = { id: user._id, name: user.name, email: user.email };
-            
-                console.log(email)
-                
-            } else {
-                res.status(401).json("Password doesn't match");
-            }
-        } else {
-            res.status(404).json("No Records found");
-        }
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json("No Records found");
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return res.status(401).json("Password doesn't match");
+  req.session.user = { id: user._id, name: user.name, email: user.email };
+  res.json("Success");
 });
-
-
 app.post("/logout", (req, res) => {
-    if (req.session) {
-        req.session.destroy(err => {
-            if (err) {
-                res.status(500).json({ error: "Failed to logout" });
-            } else {
-                res.status(200).json("Logout successful");
-            }
-        });
-    } else {
-        res.status(400).json({ error: "No session found" });
-    }
+  req.session.destroy(err => {
+    if (err) res.status(500).json("Logout failed");
+    else res.status(200).json("Logout successful");
+  });
 });
 
-app.get('/user', (req, res) => {
-    if (req.session.user) {
-        res.json({ user: req.session.user });
-    } else {
-        res.status(401).json("Not authenticated");
-    }
+app.get("/user", (req, res) => {
+  if (req.session.user) res.json({ user: req.session.user });
+  else res.status(401).json("Not authenticated");
 });
+app.put("/api/users/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, password } = req.body;
+
+    const updateFields = { name, email };
+
+  
+    if (password && password.trim() !== "") {
+      updateFields.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      updateFields,
+      { new: true } 
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(updatedUser); 
+
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ message: "Server error while updating user" });
+  }
+});
+
+
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));

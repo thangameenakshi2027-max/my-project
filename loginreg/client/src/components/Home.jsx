@@ -32,7 +32,7 @@ function Home() {
 
     return (
         <center>
-            <h1 style={{color:"white", fontSize:"5rem"}}>Welcome Home {user && user.name} !!!</h1>
+            <h1 style={{color:"white", fontSize:"5rem"}}>vanakam da mapla {user && user.name} !!!</h1>
         </center>
     );
 }
