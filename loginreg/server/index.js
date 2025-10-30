@@ -6,6 +6,7 @@ import MongoStore from "connect-mongo";
 import cors from "cors";
 import dotenv from "dotenv";
 import User from "./model/User.js";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -73,15 +74,37 @@ app.post("/api/users", async (req, res) => {
 });
 
 
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return res.status(404).json("No Records found");
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(401).json("Password doesn't match");
-  req.session.user = { id: user._id, name: user.name, email: user.email };
-  res.json("Success");
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(404).json({ message: "No user found with that email" });
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match)
+      return res.status(401).json({ message: "Incorrect password" });
+
+    
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET || "supersecretkey",
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: { id: user._id, name: user.name, email: user.email }
+    });
+
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error during login" });
+  }
 });
+
 app.post("/logout", (req, res) => {
   req.session.destroy(err => {
     if (err) res.status(500).json("Logout failed");

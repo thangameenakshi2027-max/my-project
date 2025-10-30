@@ -8,40 +8,59 @@ export default function Dashboard() {
   const [editingUser, setEditingUser] = useState(null);
   const [form, setForm] = useState({ name: "", password: "" });
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
-
   const navigate = useNavigate();
+
   const API_URL = "http://localhost:3001/api/users"; 
 
-  const fetchUsers = async () => {
+  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You must log in first!");
+      navigate("/login");
+      return;
+    }
+    fetchUsers(token);
+  }, []);
+
+  
+  const fetchUsers = async (token) => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await axios.get(API_URL, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setUsers(res.data);
     } catch (err) {
       console.error(err);
-      alert("Error fetching users");
+      alert("Error fetching users. Your session might have expired.");
+      handleLogout();
     }
   };
 
- 
   const handleAddUser = async () => {
+    const token = localStorage.getItem("token");
     if (!newUser.name || !newUser.email || !newUser.password)
       return alert("Please fill all fields");
     try {
-      await axios.post(API_URL, newUser);
+      await axios.post(API_URL, newUser, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setNewUser({ name: "", email: "", password: "" });
-      fetchUsers();
+      fetchUsers(token);
     } catch (err) {
       console.error(err);
       alert("Error adding user");
     }
   };
 
-
   const handleDelete = async (id) => {
+    const token = localStorage.getItem("token");
     if (!window.confirm("Are you sure to delete this user?")) return;
     try {
-      await axios.delete(`${API_URL}/${id}`);
-      fetchUsers();
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchUsers(token);
     } catch (err) {
       console.error(err);
       alert("Error deleting user");
@@ -53,31 +72,27 @@ export default function Dashboard() {
     setForm({ name: user.name, password: "" });
   };
 
-
   const handleUpdate = async (id) => {
+    const token = localStorage.getItem("token");
     try {
-      await axios.put(`${API_URL}/${id}`, form);
+      await axios.put(`${API_URL}/${id}`, form, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setEditingUser(null);
-      fetchUsers();
+      fetchUsers(token);
     } catch (err) {
       console.error(err);
       alert("Error updating user");
     }
   };
 
- 
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   return (
     <div className="dashboard">
-    
       <aside className="sidebar">
         <h2>Barbie Admin</h2>
         <ul>
@@ -86,11 +101,9 @@ export default function Dashboard() {
         </ul>
       </aside>
 
-     
       <main className="main-content">
         <h1>User Management</h1>
 
-     
         <div className="add-user">
           <input
             type="text"
@@ -115,7 +128,6 @@ export default function Dashboard() {
           </button>
         </div>
 
-      
         <div className="card">
           <table className="user-table">
             <thead>

@@ -1,33 +1,40 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; 
-import { Grid, Paper, TextField, Typography, Button } from "@mui/material";
+import { Grid, Paper, TextField, Typography, Button, CircularProgress } from "@mui/material";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-   const navigate = useNavigate(); 
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      const res = await axios.post("http://localhost:3001/api/auth/login", {
-        email,
-        password,
-      });
+     
+      const res = await axios.post("http://localhost:3001/api/auth/login", { email, password });
+        if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        alert("Login successful 🎉");
+        navigate("/dashboard");
+      } else {
+        alert("Invalid server response — no token received");
+      }
 
-      localStorage.setItem("token", res.data.token);
-      alert("Login successful");
-      navigate("/dashboard");
-      
     } catch (err) {
+      console.error("Login error:", err.response?.data || err.message);
+
       if (err.response) {
-        alert(err.response.data.message || "Login failed");
+        alert(err.response.data.message || "Login failed. Please check your credentials.");
       } else if (err.request) {
-        alert("No response from server. Check if backend is running.");
+        alert("No response from server. Make sure backend is running.");
       } else {
         alert("Error: " + err.message);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,8 +107,9 @@ const Login = () => {
             variant="contained"
             fullWidth
             style={btnStyle}
+            disabled={loading}
           >
-            LOGIN
+            {loading ? <CircularProgress size={24} color="inherit" /> : "LOGIN"}
           </Button>
 
           <Typography align="center" sx={{ mt: 2 }}>
