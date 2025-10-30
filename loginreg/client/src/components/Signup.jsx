@@ -119,17 +119,31 @@ const Signup = () => {
         console.log("Response from server:", result);
         if (result.status === 200 || result.status === 201) {
           window.alert("Signup successful! Welcome to the barbie World!");
-          navigate("/login");
+          
+          navigate("/login"); 
         }
       })
       .catch((err) => {
-        if (err.response && err.response.status === 400 && err.response.data.message === "Email already exists") {
+       
+        console.error("Full signup error:", err); 
+
+        if (err.response) {
          
-          window.alert("Email already exists. Please try logging in or use a different email.");
+          console.error("Server Error Data:", err.response.data);
+         
+          window.alert(err.response.data.message || "An error occurred. Please try again.");
+
+        } else if (err.request) {
+          
+          console.error("No response from server:", err.request);
+          window.alert("Could not connect to the server. Please check your connection or try again later.");
+          
         } else {
-          console.error("Signup error:", err);
-          window.alert("An error occurred during signup. Please try again later.");
+          
+          console.error("Axios setup error:", err.message);
+          window.alert("An unexpected error occurred. Please try again.");
         }
+        
       });
   };
 
@@ -182,5 +196,5 @@ const Signup = () => {
     </BackgroundGrid>
   );
 };
-
+  
 export default Signup;

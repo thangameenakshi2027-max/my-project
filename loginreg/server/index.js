@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import User from "./model/User.js";
 import jwt from "jsonwebtoken";
 
+
 dotenv.config();
 
 const app = express();
@@ -63,7 +64,7 @@ app.delete("/api/users/:id", async (req, res) => {
   }
 });
 
-app.post("/api/users", async (req, res) => {
+app.post("/api/auth/signup", async (req, res) => {
   const { name, email, password } = req.body;
   const existing = await User.findOne({ email }); 
   if (existing) return res.status(400).json({ message: "Email exists" });
