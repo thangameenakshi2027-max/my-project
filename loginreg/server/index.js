@@ -105,6 +105,8 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
+
+
 app.post("/logout", (req, res) => {
   req.session.destroy(err => {
     if (err) res.status(500).json("Logout failed");
