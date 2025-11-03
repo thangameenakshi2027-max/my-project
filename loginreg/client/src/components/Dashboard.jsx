@@ -3,6 +3,7 @@ import axios from "axios";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
 
+
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
@@ -10,9 +11,8 @@ export default function Dashboard() {
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
 
-  const API_URL = "http://localhost:3001/api/users"; 
+  const API_URL = "http://localhost:3001/api/users";
 
-  
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -23,7 +23,6 @@ export default function Dashboard() {
     fetchUsers(token);
   }, []);
 
-  
   const fetchUsers = async (token) => {
     try {
       const res = await axios.get(API_URL, {
@@ -97,6 +96,7 @@ export default function Dashboard() {
         <h2>Barbie Admin</h2>
         <ul>
           <li className="active">Dashboard</li>
+          <li onClick={() => navigate("/add-form")}>Add Form</li> {/* 👈 NEW BUTTON */}
           <li onClick={handleLogout}>Logout</li>
         </ul>
       </aside>
@@ -104,29 +104,6 @@ export default function Dashboard() {
       <main className="main-content">
         <h1>User Management</h1>
 
-        <div className="add-user">
-          <input
-            type="text"
-            placeholder="Name"
-            value={newUser.name}
-            onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={newUser.email}
-            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={newUser.password}
-            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-          />
-          <button className="btn add" onClick={handleAddUser}>
-            Add User
-          </button>
-        </div>
 
         <div className="card">
           <table className="user-table">
