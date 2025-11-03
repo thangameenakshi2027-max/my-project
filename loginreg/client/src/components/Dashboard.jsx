@@ -96,7 +96,7 @@ export default function Dashboard() {
         <h2>Barbie Admin</h2>
         <ul>
           <li className="active">Dashboard</li>
-          <li onClick={() => navigate("/add-form")}>Add Form</li> {/* 👈 NEW BUTTON */}
+          <li onClick={() => navigate("/add-form")}>Add Form</li> 
           <li onClick={handleLogout}>Logout</li>
         </ul>
       </aside>
