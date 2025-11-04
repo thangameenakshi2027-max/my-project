@@ -5,6 +5,8 @@ import Signup from './components/Signup.jsx';
 import Home from './components/Home.jsx';
 import Navbar from './components/Navbar.jsx';
 import Dashboard from './components/Dashboard.jsx';
+import CrudFormPage from "./components/CrudFormPage";
+
 
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
           <Route path="/signup" element={<Signup />}/>
           <Route path="/home" element={<Home/>}/>
            <Route path="/dashboard" element={<Dashboard/>}/>
+           <Route path="/add-form" element={<CrudFormPage />} />
+           
         </Routes>
       </BrowserRouter>
     

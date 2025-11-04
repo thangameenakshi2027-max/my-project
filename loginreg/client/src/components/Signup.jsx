@@ -22,7 +22,7 @@ const BarbiePaper = styled(Paper)(({ theme }) => ({
   overflow: 'hidden',
   '&::before': { 
     content: '""',
-    position: 'absolute',
+    position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
@@ -118,7 +118,7 @@ const Signup = () => {
       .then((result) => {
         console.log("Response from server:", result);
         if (result.status === 200 || result.status === 201) {
-          window.alert("Signup successful! Welcome to the barbie World!");
+          window.alert("Signup successful! Welcome to the  World!");
           
           navigate("/login"); 
         }
@@ -151,7 +151,7 @@ const Signup = () => {
     <BackgroundGrid container>
       <BarbiePaper elevation={10}> {}
         <BarbieHeading>SIGN UP!</BarbieHeading>
-        <BarbieSubheading>Welcome to the barbie World!</BarbieSubheading>
+        <BarbieSubheading>Welcome to the page!</BarbieSubheading>
 
         <form onSubmit={handleSignup} style={{ width: '100%' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

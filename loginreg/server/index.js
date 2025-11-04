@@ -7,6 +7,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import User from "./model/User.js";
 import jwt from "jsonwebtoken";
+import multer from "multer";
+import path from "path";
+import Item from "./model/itemModel.js";
 
 
 dotenv.config();
@@ -21,6 +24,73 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+
+app.use("/uploads", express.static("uploads"));
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage });
+
+
+
+
+app.post("/api/items", upload.single("image"), async (req, res) => {
+  try {
+    const { name, description, status } = req.body;
+    const imagePath = req.file ? `uploads/${req.file.filename}` : null;
+
+    const newItem = new Item({
+      name,
+      description,
+      status,
+      image: imagePath,
+    });
+
+    await newItem.save();
+    res.status(201).json(newItem);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to create item" });
+  }
+});
+
+
+app.get("/api/items", async (req, res) => {
+  const items = await Item.find().sort({ createdAt: -1 });
+  res.json(items);
+});
+
+
+app.put("/api/items/:id", upload.single("image"), async (req, res) => {
+  try {
+    const { name, description, status } = req.body;
+    const updateData = { name, description, status };
+    if (req.file) updateData.image = `uploads/${req.file.filename}`;
+
+    const updatedItem = await Item.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
+    res.json(updatedItem);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update item" });
+  }
+});
+
+app.delete("/api/items/:id", async (req, res) => {
+  try {
+    await Item.findByIdAndDelete(req.params.id);
+    res.json({ message: "Item deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete item" });
+  }
+});
 
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/mern_dashboard", {

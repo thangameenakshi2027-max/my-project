@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
+
 
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
@@ -10,9 +12,8 @@ export default function Dashboard() {
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
 
-  const API_URL = "http://localhost:3001/api/users"; 
+  const API_URL = "http://localhost:3001/api/users";
 
-  
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -23,7 +24,6 @@ export default function Dashboard() {
     fetchUsers(token);
   }, []);
 
-  
   const fetchUsers = async (token) => {
     try {
       const res = await axios.get(API_URL, {
@@ -94,42 +94,20 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <aside className="sidebar">
-        <h2>Barbie Admin</h2>
+        
         <ul>
-          <li className="active">Dashboard</li>
-          <li onClick={handleLogout}>Logout</li>
+          <Button className="active">Dashboard</Button>
+          <Button onClick={() => navigate("/add-form")}>Add Form</Button> {}
+          <Button  onClick={handleLogout}>Logout</Button>
         </ul>
       </aside>
 
       <main className="main-content">
         <h1>User Management</h1>
 
-        <div className="add-user">
-          <input
-            type="text"
-            placeholder="Name"
-            value={newUser.name}
-            onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={newUser.email}
-            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={newUser.password}
-            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-          />
-          <button className="btn add" onClick={handleAddUser}>
-            Add User
-          </button>
-        </div>
 
         <div className="card">
-          <table className="user-table">
+          <table className="crud-table">
             <thead>
               <tr>
                 <th>Name</th>
