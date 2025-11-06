@@ -3,15 +3,17 @@ import axios from "axios";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
-
+import CrudFormPage from "./CrudFormPage"; 
 
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
   const [form, setForm] = useState({ name: "", password: "" });
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
-  const navigate = useNavigate();
+  const [showForm, setShowForm] = useState(false); 
+  const [activePage, setActivePage] = useState("dashboard"); 
 
+  const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api/users";
 
   useEffect(() => {
@@ -94,77 +96,131 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <aside className="sidebar">
-        
         <ul>
-          <Button className="active">Dashboard</Button>
-          <Button onClick={() => navigate("/add-form")}>Add Form</Button> {}
-          <Button  onClick={handleLogout}>Logout</Button>
+         
+          <Button
+            className={activePage === "dashboard" ? "active" : ""}
+            onClick={() => {
+              setActivePage("dashboard");
+              setShowForm(false);
+            }}
+          >
+            Dashboard
+          </Button>
+
+        
+          <Button
+            className={activePage === "form" ? "active" : ""}
+            onClick={() => {
+              setActivePage("form");
+              setShowForm(true);
+            }}
+          >
+            Add Form
+          </Button>
+
+          <Button onClick={handleLogout}>Logout</Button>
         </ul>
       </aside>
 
       <main className="main-content">
-        <h1>User Management</h1>
-
-
-        <div className="card">
-          <table className="crud-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Password</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.length === 0 ? (
-                <tr>
-                  <td colSpan="4" className="empty">No users found</td>
-                </tr>
-              ) : (
-                users.map((u) => (
-                  <tr key={u._id}>
-                    <td>
-                      {editingUser === u._id ? (
-                        <input
-                          value={form.name}
-                          onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        />
-                      ) : (
-                        u.name
-                      )}
-                    </td>
-                    <td>{u.email}</td>
-                    <td>
-                      {editingUser === u._id ? (
-                        <input
-                          type="password"
-                          placeholder="New password"
-                          onChange={(e) => setForm({ ...form, password: e.target.value })}
-                        />
-                      ) : (
-                        "••••••"
-                      )}
-                    </td>
-                    <td>
-                      {editingUser === u._id ? (
-                        <>
-                          <button className="btn save" onClick={() => handleUpdate(u._id)}>Save</button>
-                          <button className="btn cancel" onClick={() => setEditingUser(null)}>Cancel</button>
-                        </>
-                      ) : (
-                        <>
-                          <button className="btn edit" onClick={() => handleEdit(u)}>Edit</button>
-                          <button className="btn delete" onClick={() => handleDelete(u._id)}>Delete</button>
-                        </>
-                      )}
-                    </td>
+       
+        {activePage === "dashboard" && (
+          <>
+            <h1>User Management</h1>
+            <div className="card">
+              <table className="crud-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Actions</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody>
+                  {users.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" className="empty">
+                        No users found
+                      </td>
+                    </tr>
+                  ) : (
+                    users.map((u) => (
+                      <tr key={u._id}>
+                        <td>
+                          {editingUser === u._id ? (
+                            <input
+                              value={form.name}
+                              onChange={(e) =>
+                                setForm({ ...form, name: e.target.value })
+                              }
+                            />
+                          ) : (
+                            u.name
+                          )}
+                        </td>
+                        <td>{u.email}</td>
+                        <td>
+                          {editingUser === u._id ? (
+                            <input
+                              type="password"
+                              placeholder="New password"
+                              onChange={(e) =>
+                                setForm({ ...form, password: e.target.value })
+                              }
+                            />
+                          ) : (
+                            "••••••"
+                          )}
+                        </td>
+                        <td>
+                          {editingUser === u._id ? (
+                            <>
+                              <button
+                                className="btn save"
+                                onClick={() => handleUpdate(u._id)}
+                              >
+                                Save
+                              </button>
+                              <button
+                                className="btn cancel"
+                                onClick={() => setEditingUser(null)}
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                className="btn edit"
+                                onClick={() => handleEdit(u)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="btn delete"
+                                onClick={() => handleDelete(u._id)}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {showForm && activePage === "form" && (
+          <div className="crud-form-container" style={{ margin: "20px 0" }}>
+            <CrudFormPage />
+          </div>
+        )}
       </main>
     </div>
   );
