@@ -161,3 +161,85 @@
   background: rgba(255, 255, 255, 0.3);
   transition: 0.3s ease;
 }
+
+
+@media (max-width: 700px) {
+ 
+  .dashboard {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+ 
+  .sidebar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #d76ba3;
+    padding: 15px 10px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  
+  .sidebar button,
+  .sidebar .MuiButton-root {
+    width: 90%;
+    margin: 6px 0;
+    padding: 10px 0;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  
+  .main-content {
+    width: 100%;
+    padding: 20px 10px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+ 
+  .crud-table {
+    width: 95%;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    margin-top: 20px;
+    border-radius: 12px;
+  }
+
+  .crud-table th,
+  .crud-table td {
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  
+  .main-content h1 {
+    font-size: 20px;
+    margin-top: 15px;
+    text-align: center;
+  }
+}
+
+
+@media (max-width: 550px) {
+  .sidebar button {
+    font-size: 13px;
+    padding: 8px 0;
+  }
+  .crud-table {
+    width: 100%;
+  }
+}
+
+
