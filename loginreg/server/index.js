@@ -5,11 +5,13 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import cors from "cors";
 import dotenv from "dotenv";
-import User from "./model/User.js";
+import User from "./models/User.js";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 import path from "path";
-import Item from "./model/itemModel.js";
+import Item from "./models/itemModel.js";
+import authRoute from "./routes/authRoute.js"
+
 
 
 dotenv.config();
@@ -26,8 +28,7 @@ app.use(cors({
 }));
 
 app.use("/uploads", express.static("uploads"));
-
-
+app.use("/api/auth",authRoute);
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
