@@ -11,6 +11,7 @@ import multer from "multer";
 import path from "path";
 import Item from "./models/itemModel.js";
 import authRoute from "./routes/authRoute.js"
+import QRCode from "qrcode";
 
 
 
@@ -217,6 +218,30 @@ app.put("/api/users/:id", async (req, res) => {
   } catch (err) {
     console.error("Error updating user:", err);
     res.status(500).json({ message: "Server error while updating user" });
+  }
+});
+app.get("/api/users/:id/qrcode", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    
+    const qrData = {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+    };
+
+    
+    const qrCode = await QRCode.toDataURL(JSON.stringify(qrData));
+    res.status(200).json({ qrCode });
+  } catch (error) {
+    console.error("❌ QR code generation failed:", error.message);
+    res.status(500).json({ message: "Failed to generate QR code" });
   }
 });
 

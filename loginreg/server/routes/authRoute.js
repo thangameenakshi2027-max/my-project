@@ -2,8 +2,6 @@ import express from "express";
 import QRCode from "qrcode";
 import User from "../models/User.js";
 
-
-
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {

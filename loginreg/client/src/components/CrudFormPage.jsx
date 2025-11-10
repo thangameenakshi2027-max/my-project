@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./CrudFormPage.css";
+import { useNavigate } from "react-router-dom";
 
-export default function CrudFormPage() {
-  const [items, setItems] = useState([]);
-  const [editingId, setEditingId] = useState(null);
+export default function CrudFormPage({ editingItem, onSaved }) {
+  const ITEM_API_URL = "http://localhost:3001/api/items";
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -13,26 +15,24 @@ export default function CrudFormPage() {
   });
   const [preview, setPreview] = useState(null);
 
-  const API_URL = "http://localhost:3001/api/items";
-
-  const fetchItems = async () => {
-    try {
-      const res = await axios.get(API_URL);
-      setItems(res.data);
-    } catch (err) {
-      console.error("Error fetching items:", err);
-    }
-  };
-
   useEffect(() => {
-    fetchItems();
-  }, []);
+    if (editingItem) {
+      setForm({
+        name: editingItem.name || "",
+        description: editingItem.description || "",
+        status: editingItem.status || "Active",
+        image: null,
+      });
+      setPreview(`http://localhost:3001/${editingItem.image}`);
+    }
+  }, [editingItem]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
-      setForm({ ...form, image: files[0] });
-      setPreview(URL.createObjectURL(files[0]));
+      const file = files[0];
+      setForm({ ...form, image: file });
+      setPreview(URL.createObjectURL(file));
     } else {
       setForm({ ...form, [name]: value });
     }
@@ -40,66 +40,62 @@ export default function CrudFormPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = new FormData();
-    data.append("name", form.name);
-    data.append("description", form.description);
-    data.append("status", form.status);
-    if (form.image) data.append("image", form.image);
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    for (const key in form) {
+      if (form[key]) formData.append(key, form[key]);
+    }
 
     try {
-      if (editingId) {
-        await axios.put(`${API_URL}/${editingId}`, data);
-        alert("✅ Item updated successfully!");
+      if (editingItem) {
+        await axios.put(`${ITEM_API_URL}/${editingItem._id}`, formData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        alert("Item updated successfully!");
       } else {
-        await axios.post(API_URL, data);
-        alert("✅ Item created successfully!");
+        await axios.post(ITEM_API_URL, formData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        alert("Item added successfully!");
       }
-      setForm({ name: "", description: "", status: "Active", image: null });
-      setPreview(null);
-      setEditingId(null);
-      fetchItems();
+      onSaved();
+      navigate("/dashboard");
     } catch (err) {
-      console.error("Error saving item:", err);
-      alert("❌ Error saving item.");
+      console.error(err);
+      alert("Save failed");
     }
   };
 
-  const handleEdit = (item) => {
-    setEditingId(item._id);
-    setForm({
-      name: item.name,
-      description: item.description,
-      status: item.status,
-      image: null,
-    });
-    setPreview(item.image ? `http://localhost:3001/${item.image}` : null);
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
-    await axios.delete(`${API_URL}/${id}`);
-    fetchItems();
-  };
-
   return (
-    <div className="crud-page">
-      <div className="crud-container">
-        <h2 className="crud-title"> CRUD FORM</h2>
-        <form onSubmit={handleSubmit} className="crud-form">
+    <div className="crud-form-container">
+      <form className="crud-form" onSubmit={handleSubmit}>
+        <h2>{editingItem ? "Edit Item" : "Add New Item"}</h2>
+
+        <div>
+          <label>Name</label>
           <input
             type="text"
             name="name"
             value={form.name}
             onChange={handleChange}
-            placeholder="Enter Name"
+            placeholder="Enter item name"
             required
           />
+        </div>
+
+        <div>
+          <label>Description</label>
           <textarea
             name="description"
             value={form.description}
             onChange={handleChange}
-            placeholder="Enter Description"
-          />
+            rows="3"
+            placeholder="Enter description"
+          ></textarea>
+        </div>
+
+        <div>
+          <label>Status</label>
           <select
             name="status"
             value={form.status}
@@ -108,61 +104,31 @@ export default function CrudFormPage() {
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
           </select>
+        </div>
 
-          <input type="file" name="image" accept="image/*" onChange={handleChange} />
+        <div className="file-input">
+          <label>Upload Image</label>
+          <input type="file" name="image" onChange={handleChange} />
+          {preview && (
+            <img
+              src={preview}
+              alt="Preview"
+              className="image-preview"
+            />
+          )}
+        </div>
 
-          {preview && <img src={preview} alt="Preview" className="preview-img" />}
-
-          <div className="button-group">
-            <button type="submit" className="btn btn-create">
-              {editingId ? "Update" : "Create"}
-            </button>
-            {editingId && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingId(null);
-                  setForm({ name: "", description: "", status: "Active", image: null });
-                  setPreview(null);
-                }}
-                className="btn btn-cancel"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-
-      <h3 className="list-title"> Items List</h3>
-      <div className="item-list">
-        {items.length === 0 ? (
-          <p className="no-items">No items found.</p>
-        ) : (
-          items.map((item) => (
-            <div key={item._id} className="item-card">
-              {item.image && (
-                <img
-                  src={`http://localhost:3001/${item.image}`}
-                  alt={item.name}
-                  className="item-img"
-                />
-              )}
-              <h4>{item.name}</h4>
-              <p>{item.description}</p>
-              <div className="item-meta">
-                <p><b>Status:</b> {item.status}</p>
-                <p><b>Created:</b> {new Date(item.createdAt).toLocaleString()}</p>
-                <p><b>Updated:</b> {new Date(item.updatedAt).toLocaleString()}</p>
-              </div>
-              <div className="item-buttons">
-                <button onClick={() => handleEdit(item)} className="btn btn-edit">Edit</button>
-                <button onClick={() => handleDelete(item._id)} className="btn btn-delete">Delete</button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+        <div className="form-buttons">
+          <button type="submit">Save</button>
+          <button
+            type="button"
+            className="cancel-btn"
+            onClick={() => navigate("/dashboard")}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
