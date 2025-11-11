@@ -4,8 +4,10 @@
   width: 100vw;
   background: linear-gradient(135deg, #ff80aa, #ff99b9);
   font-family: "Poppins", sans-serif;
-  overflow: hidden;
+  overflow-x: auto;   
+  overflow-y: auto;
 }
+
 
 
 .sidebar {
@@ -66,7 +68,7 @@
   background: rgba(255, 255, 255, 0.8);
   border-radius: 10px;
   overflow: hidden;
-   table-layout: fixed;
+
 }
 
 .user-table th,
@@ -115,6 +117,7 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  table-layout: auto;
 }
 
 .crud-table thead {
@@ -139,7 +142,8 @@
 
 .crud-table th:nth-child(1),
 .crud-table td:nth-child(1) {
-  width: 25%;
+  width: 20%;
+  min-width: 100px;
 }
 
 .crud-table th:nth-child(2),
@@ -154,8 +158,9 @@
 
 .crud-table th:nth-child(4),
 .crud-table td:nth-child(4) {
-  width: 20%;
+  width: 25%;
 }
+
 
 .crud-table tbody tr:hover {
   background: rgba(255, 255, 255, 0.3);
@@ -404,4 +409,11 @@
 
 .btn.view:hover {
   background-color: #5a4abf;
+}
+@media (max-width: 700px) {
+  .crud-table {
+    width: 250%;
+    display: table; /* ✅ show as full table instead of block */
+    white-space: normal; /* ✅ wrap text so it fits */
+  }
 }

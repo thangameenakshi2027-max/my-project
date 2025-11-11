@@ -66,9 +66,10 @@ const Login = () => {
     justifyContent="center"
     alignItems="center"
     sx={{
-      minHeight: "100vh",
-      background: "linear-gradient(to bottom, #ff7aa8, #ff8eb8)",
-    }}
+  minHeight: "100vh",
+  background: "linear-gradient(135deg, #ff80aa, #ff99b9)",
+}}
+
   >
     <Paper
       elevation={6}
