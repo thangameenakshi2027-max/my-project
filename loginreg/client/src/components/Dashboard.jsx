@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+} from "@mui/material";
 import CrudFormPage from "./CrudFormPage";
 
 export default function Dashboard() {
@@ -14,8 +21,6 @@ export default function Dashboard() {
   const [activePage, setActivePage] = useState("dashboard");
   const [items, setItems] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
-
- 
   const [viewingUser, setViewingUser] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -23,7 +28,6 @@ export default function Dashboard() {
   const API_URL = "http://localhost:3001/api/users";
   const ITEM_API_URL = "http://localhost:3001/api/items";
 
-  
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -60,7 +64,6 @@ export default function Dashboard() {
     }
   };
 
-  
   const handleAddUser = async () => {
     const token = localStorage.getItem("token");
     if (!newUser.name || !newUser.email || !newUser.password)
@@ -110,11 +113,9 @@ export default function Dashboard() {
     }
   };
 
-  
   const handleViewUser = async (user) => {
     const token = localStorage.getItem("token");
     try {
-     
       const res = await axios.get(`${API_URL}/${user._id}/qrcode`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -126,7 +127,6 @@ export default function Dashboard() {
     }
   };
 
- 
   const handleItemEdit = (item) => {
     setEditingItem(item);
     setShowForm(true);
@@ -148,16 +148,14 @@ export default function Dashboard() {
     }
   };
 
-  
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
- 
   return (
     <div className="dashboard">
-     
+      
       <aside className="sidebar">
         <ul>
           <Button
@@ -196,7 +194,7 @@ export default function Dashboard() {
         </ul>
       </aside>
 
-     
+      
       <main className="main-content">
         {activePage === "dashboard" && (
           <>
@@ -265,11 +263,9 @@ export default function Dashboard() {
                             </>
                           ) : (
                             <>
-                             
                               <button
                                 className="btn view"
                                 onClick={() => handleViewUser(u)}
-                                
                               >
                                 View
                               </button>
@@ -326,6 +322,13 @@ export default function Dashboard() {
                       <p>
                         <b>Status:</b> {item.status}
                       </p>
+
+                      
+                      <p>
+                        <b>Created By:</b>{" "}
+                        {item.createdBy?.name || "You"}
+                      </p>
+
                       <p>
                         <b>Created:</b>{" "}
                         {new Date(item.createdAt).toLocaleString()}

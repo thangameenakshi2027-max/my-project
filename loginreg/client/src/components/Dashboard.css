@@ -413,7 +413,7 @@
 @media (max-width: 700px) {
   .crud-table {
     width: 250%;
-    display: table; /* ✅ show as full table instead of block */
-    white-space: normal; /* ✅ wrap text so it fits */
+    display: table;
+    white-space: normal;
   }
 }

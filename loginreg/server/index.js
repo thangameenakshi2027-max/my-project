@@ -28,6 +28,21 @@ app.use(cors({
   credentials: true
 }));
 
+function verifyToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: "No token provided" });
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey");
+    req.user = decoded; 
+    next();
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
+  }
+}
+
+
 app.use("/uploads", express.static("uploads"));
 app.use("/api/auth",authRoute);
 const storage = multer.diskStorage({
@@ -43,7 +58,7 @@ const upload = multer({ storage });
 
 
 
-app.post("/api/items", upload.single("image"), async (req, res) => {
+app.post("/api/items", verifyToken, upload.single("image"), async (req, res) => {
   try {
     const { name, description, status } = req.body;
     const imagePath = req.file ? `uploads/${req.file.filename}` : null;
@@ -53,19 +68,33 @@ app.post("/api/items", upload.single("image"), async (req, res) => {
       description,
       status,
       image: imagePath,
+      createdBy: req.user.id, 
     });
 
     await newItem.save();
     res.status(201).json(newItem);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to create item" });
+    console.error("Item creation failed:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
 
-app.get("/api/items", async (req, res) => {
-  const items = await Item.find().sort({ createdAt: -1 });
+app.get("/api/items", verifyToken ,async (req, res) => {
+  const authHeader = req.headers.authorization;
+if (!authHeader) return res.status(401).json({ message: "No token provided" });
+
+const token = authHeader.split(" ")[1];
+let decoded;
+try {
+  decoded = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey");
+} catch (err) {
+  return res.status(403).json({ message: "Invalid token" });
+}
+
+
+const items = await Item.find({ createdBy: decoded.id }).sort({ createdAt: -1 });
+
   res.json(items);
 });
 
