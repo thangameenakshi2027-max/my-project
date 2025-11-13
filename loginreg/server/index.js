@@ -208,7 +208,6 @@ app.post("/api/auth/login", async (req, res) => {
 });
 
 
-
 app.post("/logout", (req, res) => {
   req.session.destroy(err => {
     if (err) res.status(500).json("Logout failed");
@@ -219,6 +218,7 @@ app.post("/logout", (req, res) => {
 app.get("/user", (req, res) => {
   if (req.session.user) res.json({ user: req.session.user });
   else res.status(401).json("Not authenticated");
+
 });
 app.put("/api/users/:id", async (req, res) => {
   try {
