@@ -67,7 +67,7 @@ const Login = () => {
     alignItems="center"
     sx={{
   minHeight: "100vh",
-  background: "linear-gradient(135deg, #ff80aa, #ff99b9)",
+  
 }}
 
   >
@@ -78,7 +78,7 @@ const Login = () => {
         width: 350,
         borderRadius: 15,
         backgroundColor: "#fff",
-        boxShadow: "0px 4px 15px rgba(0,0,0,0.1)",
+        boxShadow: "0px 4px 15px rgba(146, 110, 134, 0.1)",
       }}
     >
       <Grid align="center">

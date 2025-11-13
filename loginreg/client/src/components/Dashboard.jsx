@@ -303,7 +303,7 @@ export default function Dashboard() {
 
         {activePage === "items" && (
           <div className="items-container">
-            <h2>Items List</h2>
+            <h2>ITEM LIST</h2>
             {items.length === 0 ? (
               <p>No items found</p>
             ) : (
